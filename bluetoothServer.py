@@ -3,17 +3,15 @@ import os
 import shutil
 
 
-
 def create_temp_files():
-    if os.path.exists('../../Documents/Uni/4rt/2nSem/Robotica/projecte/Traffic-Car/temp'):
-        shutil.rmtree('../../Documents/Uni/4rt/2nSem/Robotica/projecte/Traffic-Car/temp')
-    os.mkdir('../../Documents/Uni/4rt/2nSem/Robotica/projecte/Traffic-Car/temp')
+    if os.path.exists('/temp'):
+        shutil.rmtree('/temp')
+    os.mkdir('/temp')
 
 
 def remove_temp_files():
-    if os.path.exists('../../Documents/Uni/4rt/2nSem/Robotica/projecte/Traffic-Car/temp'):
-        shutil.rmtree('../../Documents/Uni/4rt/2nSem/Robotica/projecte/Traffic-Car/temp')
-
+    if os.path.exists('/temp'):
+        shutil.rmtree('/temp')
 
 if __name__ == '__main__':
     create_temp_files()
