@@ -7,14 +7,14 @@ SERVER_PORT = 4
 
 
 def create_temp_files():
-    if os.path.exists('/temp'):
-        shutil.rmtree('/temp')
-    os.mkdir('/temp')
+    if os.path.exists('temp'):
+        shutil.rmtree('temp')
+    os.mkdir('temp')
 
 
 def remove_temp_files():
-    if os.path.exists('/temp'):
-        shutil.rmtree('/temp')
+    if os.path.exists('temp'):
+        shutil.rmtree('temp')
 
 
 if __name__ == '__main__':
