@@ -19,6 +19,6 @@ def remove_temp_files():
 
 if __name__ == '__main__':
     sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-    sock.connect((SERVER_ADDRESS, SERVER_PORT))
+    sock.connect((SERVER_ADDRESS.lower(), SERVER_PORT))
     data = sock.recv(1024)
     print(data)
