@@ -4,7 +4,7 @@ import shutil
 
 RP_ADDR = 'DC:A6:32:AA:AA:E6'
 SERVER_ADDRESS = '04:6C:59:F1:F3:E1'
-SERVER_PORT = 4
+SERVER_PORT = 5
 
 
 def create_temp_files():
