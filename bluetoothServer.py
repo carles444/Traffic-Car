@@ -2,6 +2,7 @@ import socket
 import os
 import shutil
 
+RP_ADDR = 'DC:A6:32:AA:AA:E6'
 
 def create_temp_files():
     if os.path.exists('temp'):
@@ -22,7 +23,7 @@ if __name__ == '__main__':
     MY_ADDRESS = MY_ADDRESS.replace('\n', '')
     PORT = 4
     sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-    sock.bind((MY_ADDRESS, PORT))
+    sock.bind((RP_ADDR, PORT))
     sock.listen(1)
     print('listening')
     while True:

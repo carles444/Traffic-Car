@@ -2,6 +2,7 @@ import socket
 import os
 import shutil
 
+RP_ADDR = 'DC:A6:32:AA:AA:E6'
 SERVER_ADDRESS = '04:6C:59:F1:F3:E1'
 SERVER_PORT = 4
 
@@ -19,7 +20,7 @@ def remove_temp_files():
 
 if __name__ == '__main__':
     sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-    sock.connect((SERVER_ADDRESS, SERVER_PORT))
+    sock.connect((RP_ADDR, SERVER_PORT))
     print('connected')
     data = sock.recv(1024)
     print(data)
