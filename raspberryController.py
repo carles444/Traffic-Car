@@ -3,6 +3,8 @@ import os
 import shutil
 import logging
 import time
+from datetime import datetime
+
 
 RP_ADDR = 'DC:A6:32:AA:AA:E6'
 SERVER_ADDRESS = '04:6C:59:F1:F3:E1'
@@ -33,7 +35,13 @@ class Controller:
 
     
     def init_logger(self, level):
+        with open('raspberryController.log', 'a') as log_file:
+            log_file.write('\n\n')
+            log_file.write(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+            log_file.write('\n\n')
+
         self.logger = logging.getLogger('Controller')
+        logging.basicConfig(filename='raspberryController.log')
         self.logger.setLevel(level)
         ch = logging.StreamHandler()
         ch.setLevel(level)
