@@ -25,10 +25,11 @@ if __name__ == '__main__':
     sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
     sock.bind((MY_ADDRESS, PORT))
     sock.listen(1)
-    print('listening')
+    print('listening...')
     while True:
         c, addr = sock.accept()
         print('new connection')
         c.send('Connected'.encode())
         c.close()
         print(addr)
+    remove_temp_files()
