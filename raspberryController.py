@@ -1,10 +1,9 @@
 import socket
 import os
 import shutil
-import logging
 import time
-from datetime import datetime
-
+from manualController import manualDriver
+from logger import *
 
 RP_ADDR = 'DC:A6:32:AA:AA:E6'
 SERVER_ADDRESS = '04:6C:59:F1:F3:E1'
@@ -27,27 +26,11 @@ class Controller:
         self.modes = ['manual', 'autonomous', 'exit']
         self.connected = False
         self.DEFAULT_TIMEOUT = 5
-        self.init_logger(logging.INFO)
+        self.logger = Logger().getLogger('controller', logging.DEBUG)
         self.server_addr = server_addr
         self.port = port
         self.logger.debug(f'Controller initializated with Server addr: {self.server_addr}')
         self.logger.debug(f'Controller initializated with port: {self.port}')
-
-    
-    def init_logger(self, level):
-        with open('raspberryController.log', 'a') as log_file:
-            log_file.write('\n\n')
-            log_file.write(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-            log_file.write('\n\n')
-
-        self.logger = logging.getLogger('Controller')
-        logging.basicConfig(filename='raspberryController.log')
-        self.logger.setLevel(level)
-        ch = logging.StreamHandler()
-        ch.setLevel(level)
-        formatter = logging.Formatter('%(asctime)s: %(name)s  [%(levelname)s]  %(message)s')
-        ch.setFormatter(formatter)
-        self.logger.addHandler(ch)
         
     def connect(self):
         self.sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
@@ -64,10 +47,13 @@ class Controller:
         self.logger.info('Connected to controller successfully')
     
     def manual_mode(self):
-        pass
+        self.logger.info('Entering in manual mode')
+        if self.manual_driver is None:
+            self.manual_driver = manualDriver(self.sock)
+        self.manual_driver()
     
     def autonomous_mode(self):
-        pass
+        self.logger.info('Entering in autonomous mode')
         
     def __call__(self):
         self.connect()
