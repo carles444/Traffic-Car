@@ -7,7 +7,7 @@ from logger import *
 
 RP_ADDR = 'DC:A6:32:AA:AA:E6'
 SERVER_ADDRESS = '04:6C:59:F1:F3:E1'
-SERVER_PORT = 5005
+SERVER_PORT = '00000000000000000000000000000005'
 
 
 def create_temp_files():

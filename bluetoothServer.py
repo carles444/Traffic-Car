@@ -21,7 +21,7 @@ if __name__ == '__main__':
     with open('temp/address.txt', 'r') as file:
         MY_ADDRESS = file.readline()
     MY_ADDRESS = MY_ADDRESS.replace('\n', '')
-    PORT = 5005
+    PORT = '00000000000000000000000000000005'
     sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
     sock.bind((MY_ADDRESS, PORT))
     sock.listen(1)
