@@ -6,7 +6,7 @@ from manualController import manualDriver
 from logger import *
 
 RP_ADDR = 'DC:A6:32:AA:AA:E6'
-SERVER_ADDRESS = '046C59F1F3E1'
+SERVER_ADDRESS = '04:6C:59:F1:F3:E1'
 SERVER_PORT = 5
 
 
