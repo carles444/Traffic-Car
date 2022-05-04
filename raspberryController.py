@@ -41,7 +41,7 @@ class Controller:
                 self.sock.connect((SERVER_ADDRESS, SERVER_PORT))
                 self.connected = True
             except socket.error:
-                self.logger.error(f"Error: Couldn't connect to controller, retrying in {self.DEFAULT_TIMEOUT} seconds...")
+                self.logger.error(f"{socket.error}, retrying in {self.DEFAULT_TIMEOUT} seconds...")
                 time.sleep(self.DEFAULT_TIMEOUT)
                 
         self.logger.info('Connected to controller successfully')
