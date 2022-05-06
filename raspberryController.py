@@ -51,7 +51,6 @@ class Controller:
         while len(services) == 0:
             self.logger.info('Connecting to controller...')
             services = bluetooth.find_service(uuid=self.uuid_service)
-        print(services)
         self.port = services[0]['port']
         self.name = services[0]['name']
         self.address = services[0]['host']
@@ -71,6 +70,7 @@ class Controller:
     def __call__(self):
         self.connect()
         data = self.sock.recv(1024).decode().lower()
+        self.sock.close()
         while data not in self.modes:
             if data == 'manual':
                 self.logger.info('Using manual mode')
