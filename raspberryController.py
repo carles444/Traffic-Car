@@ -51,6 +51,7 @@ class Controller:
         while len(services) == 0:
             self.logger.info('Connecting to controller...')
             services = bluetooth.find_service(uuid=self.uuid_service)
+        print(services)
         self.port = services[0]['port']
         self.name = services[0]['name']
         self.address = services[0]['host']
