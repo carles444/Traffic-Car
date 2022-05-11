@@ -23,7 +23,17 @@ class manualDriver:
         self.communication_socket = comunication_socket
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
         #gpio.setmode(gpio.BOARD)
-
+    
+    def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
+        if forward_bit:
+            self.logger.debug('forward')
+        if breaks_bit >> 1:
+            self.logger.debug('breaks')
+        if left_bit >> 2:
+            self.logger.debug('left')
+        if right_bit >> 3:
+            self.logger.debug('right')
+            
     def __call__(self):
         while True:
             data = int.from_bytes(self.communication_socket.recv(1), 'big')
@@ -34,11 +44,9 @@ class manualDriver:
             elif packet_id != Packet.MOVE:
                 continue
             metadata = data & 0xf
-            if metadata == MovementState.FORWARD:
-                self.logger.debug("forward")
-            elif metadata == MovementState.BREAKS:
-                self.logger.debug("breaks")
-            elif metadata == MovementState.RIGHT:
-                self.logger.debug("right")
-            elif metadata == MovementState.LEFT:
-                self.logger.debug("left")
+            forward_bit = metadata & 0x1
+            breaks_bit = metadata & 0x2
+            left_bit = metadata & 0x4
+            right_bit = metadata & 0x8
+            self.apply_movement(forward_bit, breaks_bit, left_bit, right_bit)
+        
