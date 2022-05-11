@@ -1,5 +1,6 @@
 #import RPi.GPIO as gpio
 from enum import IntEnum
+from logger import *
 
 class Packet(IntEnum):
     SET_MODE = 1
@@ -20,6 +21,7 @@ class MovementState(IntEnum):
 class manualDriver:
     def __init__(self, comunication_socket):
         self.communication_socket = comunication_socket
+        self.logger = logging.getLogger('manualDriver', logging.DEBUG)
         #gpio.setmode(gpio.BOARD)
 
     def __call__(self):
@@ -27,15 +29,16 @@ class manualDriver:
             data = int.from_bytes(self.communication_socket.recv(1), 'big')
             packet_id = (data >> 4) & 0xf
             if packet_id == Packet.SET_MODE:
+                self.logger.info("Changing mode... ")
                 return data
             elif packet_id != Packet.MOVE:
                 continue
             metadata = data & 0xf
             if metadata == MovementState.FORWARD:
-                pass
+                self.logger.debug("forward")
             elif metadata == MovementState.BREAKS:
-                pass
+                self.logger.debug("breaks")
             elif metadata == MovementState.RIGHT:
-                pass
+                self.logger.debug("right")
             elif metadata == MovementState.LEFT:
-                pass
+                self.logger.debug("left")
