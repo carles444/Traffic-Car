@@ -2,7 +2,7 @@ from enum import IntEnum
 import os
 import shutil
 import time
-from manualDriver import manualDriver
+from manualDriver import *
 from logger import *
 import bluetooth
 
@@ -22,14 +22,7 @@ def remove_temp_files():
         shutil.rmtree('temp')
 
 
-class Packet(IntEnum):
-    SET_MODE = 1
-    MOVE = 2
 
-class RobotState(IntEnum):
-    MANUAL = 1
-    AUTONOMOUS = 2
-    EXIT = 3
     
 class Controller:
     def __init__(self, uuid_service):

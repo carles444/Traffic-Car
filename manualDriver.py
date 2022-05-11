@@ -2,6 +2,14 @@
 from raspberryController import Packet, RobotState
 from enum import IntEnum
 
+class Packet(IntEnum):
+    SET_MODE = 1
+    MOVE = 2
+
+class RobotState(IntEnum):
+    MANUAL = 1
+    AUTONOMOUS = 2
+    EXIT = 3
 
 class MovementState(IntEnum):
     FORWARD = 9
