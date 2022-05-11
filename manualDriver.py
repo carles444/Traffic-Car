@@ -1,5 +1,4 @@
 #import RPi.GPIO as gpio
-from raspberryController import Packet, RobotState
 from enum import IntEnum
 
 class Packet(IntEnum):
