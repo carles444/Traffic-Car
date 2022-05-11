@@ -55,33 +55,34 @@ class Controller:
         self.logger.info('Connected to controller successfully')
         
     def manual_mode(self):
-        return
         self.logger.info('Entering in manual mode')
         if self.manual_driver is None:
             self.manual_driver = manualDriver(self.sock)
-        self.manual_driver()
+        return self.manual_driver()
     
     def autonomous_mode(self):
         self.logger.info('Entering in autonomous mode')
         
     def __call__(self):
         self.connect()
+        data = None
         while True:
-            data = int.from_bytes(self.sock.recv(1), 'big')
+            if data is None:
+                data = int.from_bytes(self.sock.recv(1), 'big')
             packet_id = (data >> 4) & 0xf
+            if packet_id != Packet.SET_MODE:
+                continue
             metadata = data & 0xf
-            if packet_id == Packet.SET_MODE:
-                self.manual_mode()
-                if metadata == RobotState.AUTONOMOUS:
-                    self.logger.info('Using autonomous mode')
-                    self.autonomous_mode()
-                elif metadata == RobotState.MANUAL:
-                    self.logger.info('Using manual mode')
-                    self.manual_mode()
-                elif metadata == RobotState.EXIT:
-                    self.sock.close()
-                    self.logger.info(f'Exited')
-                    exit(0)
+            if metadata == RobotState.AUTONOMOUS:
+                self.logger.info('Using autonomous mode')
+                data = self.autonomous_mode()
+            elif metadata == RobotState.MANUAL:
+                self.logger.info('Using manual mode')
+                data = self.manual_mode()
+            elif metadata == RobotState.EXIT:
+                self.sock.close()
+                self.logger.info(f'Exited')
+                exit(0)
                 
 
 if __name__ == '__main__':
