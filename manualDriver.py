@@ -21,7 +21,7 @@ class MovementState(IntEnum):
 class manualDriver:
     def __init__(self, comunication_socket):
         self.communication_socket = comunication_socket
-        self.logger = logging.getLogger('manualDriver', logging.DEBUG)
+        self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
         #gpio.setmode(gpio.BOARD)
 
     def __call__(self):
