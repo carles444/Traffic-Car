@@ -2,7 +2,7 @@ from enum import IntEnum
 import os
 import shutil
 import time
-from manualController import manualDriver
+from manualDriver import manualDriver
 from logger import *
 import bluetooth
 
@@ -34,6 +34,8 @@ class RobotState(IntEnum):
 class Controller:
     def __init__(self, uuid_service):
         self.modes = ['manual', 'autonomous', 'exit']
+        self.manual_driver = None
+        self.autonomous_driver = None
         self.uuid_service = uuid_service
         self.connected = False
         self.DEFAULT_TIMEOUT = 5
@@ -53,6 +55,7 @@ class Controller:
         self.logger.info('Connected to controller successfully')
         
     def manual_mode(self):
+        return
         self.logger.info('Entering in manual mode')
         if self.manual_driver is None:
             self.manual_driver = manualDriver(self.sock)
@@ -67,8 +70,6 @@ class Controller:
             data = int.from_bytes(self.sock.recv(1), 'big')
             packet_id = (data >> 4) & 0xf
             metadata = data & 0xf
-            self.logger.debug(packet_id)
-            self.logger.debug(metadata)
             if packet_id == Packet.SET_MODE:
                 self.manual_mode()
                 if metadata == RobotState.AUTONOMOUS:
@@ -77,7 +78,7 @@ class Controller:
                 elif metadata == RobotState.MANUAL:
                     self.logger.info('Using manual mode')
                     self.manual_mode()
-                elif data == RobotState.EXIT:
+                elif metadata == RobotState.EXIT:
                     self.sock.close()
                     self.logger.info(f'Exited')
                     exit(0)
