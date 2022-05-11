@@ -12,10 +12,10 @@ class RobotState(IntEnum):
     EXIT = 3
 
 class MovementState(IntEnum):
-    FORWARD = 9
+    FORWARD = 1
     RIGHT = 8
-    BREAKS = 6
-    LEFT = 2
+    BREAKS = 2
+    LEFT = 4
     
 
 class manualDriver:
