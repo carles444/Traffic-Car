@@ -26,6 +26,11 @@ class Packet(Enum):
     SET_MODE = 1
     MOVE = 2
 
+class RobotState(Enum):
+    MANUAL = 1
+    AUTONOMOUS = 2
+    EXIT = 3
+    
 class Controller:
     def __init__(self, uuid_service):
         self.modes = ['manual', 'autonomous', 'exit']
@@ -60,18 +65,21 @@ class Controller:
         self.connect()
         while True:
             data = int.from_bytes(self.sock.recv(1), 'big')
+            packet_id = (data >> 4) & 0xf
+            metadata = data & 0xf
             self.logger.debug(data)
-            if data == 'manual':
-                self.logger.info('Using manual mode')
+            if packet_id == Packet.SET_MODE:
                 self.manual_mode()
-            elif data == 'autonomous':
-                self.logger.info('Using autonomous mode')
-                self.autonomous_mode()
-            elif data == 'exit':
-                self.logger.info(f'Exited')
-                exit(0)
-            
-
+                if metadata == RobotState.AUTONOMOUS:
+                    self.logger.info('Using autonomous mode')
+                    self.autonomous_mode()
+                elif metadata == RobotState.MANUAL:
+                    self.logger.info('Using manual mode')
+                    self.manual_mode()
+                elif data == RobotState.EXIT:
+                    self.sock.close()
+                    self.logger.info(f'Exited')
+                    exit(0)
                 
 
 if __name__ == '__main__':
