@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 import os
 import shutil
 import time
@@ -22,11 +22,11 @@ def remove_temp_files():
         shutil.rmtree('temp')
 
 
-class Packet(Enum):
+class Packet(IntEnum):
     SET_MODE = 1
     MOVE = 2
 
-class RobotState(Enum):
+class RobotState(IntEnum):
     MANUAL = 1
     AUTONOMOUS = 2
     EXIT = 3
