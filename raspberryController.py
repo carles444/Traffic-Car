@@ -67,7 +67,8 @@ class Controller:
             data = int.from_bytes(self.sock.recv(1), 'big')
             packet_id = (data >> 4) & 0xf
             metadata = data & 0xf
-            self.logger.debug(packet_id, metadata)
+            self.logger.debug(packet_id)
+            self.logger.debug(metadata)
             if packet_id == Packet.SET_MODE:
                 self.manual_mode()
                 if metadata == RobotState.AUTONOMOUS:
