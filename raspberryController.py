@@ -30,22 +30,7 @@ class Controller:
         self.DEFAULT_TIMEOUT = 5
         self.logger = Logger().getLogger('Raspberry Controller', logging.DEBUG)
         self.logger.debug(f'Controller initializated with uuid: {self.uuid_service}')
-       
-    """ 
-    def connect(self):
-        self.sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        self.sock.settimeout(self.DEFAULT_TIMEOUT)
-        self.logger.info(f'Connecting to controller...')
-        while not self.connected:
-            try:
-                self.sock.connect((SERVER_ADDRESS, SERVER_PORT))
-                self.connected = True
-            except socket.gaierror as exc:
-                self.logger.error(f"{exc}, retrying in {self.DEFAULT_TIMEOUT} seconds...")
-                time.sleep(self.DEFAULT_TIMEOUT)
-                
-        self.logger.info('Connected to controller successfully')
-    """
+
     def connect(self):
         services = []
         while len(services) == 0:
@@ -69,9 +54,9 @@ class Controller:
         
     def __call__(self):
         self.connect()
-        data = self.sock.recv(1024).decode().lower()
-        self.sock.close()
-        while data not in self.modes:
+        while True:
+            data = hex(int(self.sock.recv(4)))
+            self.logger.debug(data)
             if data == 'manual':
                 self.logger.info('Using manual mode')
                 self.manual_mode()
@@ -81,7 +66,7 @@ class Controller:
             elif data == 'exit':
                 self.logger.info(f'Exited')
                 exit(0)
-            data = self.sock.recv(1024).decode().lower()
+            
 
                 
 
