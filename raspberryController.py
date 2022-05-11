@@ -55,7 +55,7 @@ class Controller:
     def __call__(self):
         self.connect()
         while True:
-            data = hex(int(self.sock.recv(4)))
+            data = self.sock.recv(4)
             self.logger.debug(data)
             if data == 'manual':
                 self.logger.info('Using manual mode')
