@@ -1,4 +1,4 @@
-import socket
+from enum import Enum
 import os
 import shutil
 import time
@@ -21,6 +21,10 @@ def remove_temp_files():
     if os.path.exists('temp'):
         shutil.rmtree('temp')
 
+
+class Packet(Enum):
+    SET_MODE = 1
+    MOVE = 2
 
 class Controller:
     def __init__(self, uuid_service):
@@ -55,7 +59,7 @@ class Controller:
     def __call__(self):
         self.connect()
         while True:
-            data = self.sock.recv(4)
+            data = int.from_bytes(self.sock.recv(1), 'big')
             self.logger.debug(data)
             if data == 'manual':
                 self.logger.info('Using manual mode')
