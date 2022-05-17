@@ -6,8 +6,8 @@ from gpiozero import Servo, Device
 import os
 
 class Pins(IntEnum):
-    DC_0 = 16
-    DC_1 = 18
+    DC_0 = 23
+    DC_1 = 24
     SERVO = 25
 
 class Packet(IntEnum):
@@ -27,11 +27,13 @@ class MovementState(IntEnum):
 
 def init_igpiod(logger):
     try:
+        pass
         #os.system('sudo killall pigpiod')
-        os.system('sudo pigpiod')
+        #os.system('sudo pigpiod')
     except OSError:
         logger.error("Could not init igpiod")
     finally:
+        # avoiding jitter on servomotor
         Device.pin_factory = PiGPIOFactory()
 
 class manualDriver:
@@ -40,13 +42,13 @@ class manualDriver:
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
         init_igpiod(self.logger)
         #gpio.setmode(gpio.BOARD)
-        #gpio.setup(Pins.DC_0, gpio.OUT)
-        #gpio.setup(Pins.DC_1, gpio.OUT)
+        gpio.setup(Pins.DC_0, gpio.OUT)
+        gpio.setup(Pins.DC_1, gpio.OUT)
         self.servo = Servo(Pins.SERVO)
         
     
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
-        """
+        
         if forward_bit >> MovementState.FORWARD:
             self.logger.debug('forward')
             gpio.output(Pins.DC_0, True)
@@ -69,7 +71,7 @@ class manualDriver:
         else:
             self.logger.debug('rest steering')
             self.servo.mid()
-            
+          """  
     def __call__(self):
         while True:
             data = int.from_bytes(self.communication_socket.recv(1), 'big')
