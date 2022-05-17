@@ -1,6 +1,7 @@
 import RPi.GPIO as gpio
 from enum import IntEnum
 from logger import *
+from gpiozero.pins.native import NativeFactory
 from gpiozero import Servo, Device
 import os
 
@@ -28,11 +29,10 @@ def init_igpiod(logger):
     try:
         os.system('sudo killall pigpiod')
         os.system('sudo pigpiod')
-        os.system('GPIOZERO_PIN_FACTORY=native')
     except OSError:
         logger.error("Could not init igpiod")
     finally:
-        Device._default_pin_factory()
+        Device.pin_factory = NativeFactory()
 
 class manualDriver:
     def __init__(self, comunication_socket):
