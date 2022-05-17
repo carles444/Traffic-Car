@@ -1,7 +1,7 @@
 import RPi.GPIO as gpio
 from enum import IntEnum
 from logger import *
-from gpiozero import Servo
+from gpiozero import Servo, Device
 import os
 
 class Pins(IntEnum):
@@ -28,8 +28,11 @@ def init_igpiod(logger):
     try:
         os.system('sudo killall pigpiod')
         os.system('sudo pigpiod')
+        os.system('GPIOZERO_PIN_FACTORY=native')
     except OSError:
         logger.error("Could not init igpiod")
+    finally:
+        Device._default_pin_factory()
 
 class manualDriver:
     def __init__(self, comunication_socket):
