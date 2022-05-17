@@ -2,6 +2,7 @@ import RPi.GPIO as gpio
 from enum import IntEnum
 from logger import *
 from gpiozero import Servo
+import os
 
 class Pins(IntEnum):
     DC_0 = 16
@@ -28,10 +29,12 @@ class manualDriver:
     def __init__(self, comunication_socket):
         self.communication_socket = comunication_socket
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
+        os.system('sudo pigpiod')
         gpio.setmode(gpio.BOARD)
         #gpio.setup(Pins.DC_0, gpio.OUT)
         #gpio.setup(Pins.DC_1, gpio.OUT)
         self.servo = Servo(Pins.SERVO)
+        
     
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
         """
