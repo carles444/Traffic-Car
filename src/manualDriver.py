@@ -31,7 +31,7 @@ class manualDriver:
         gpio.setmode(gpio.BOARD)
         gpio.setup(Pins.DC_0, gpio.OUT)
         gpio.setup(Pins.DC_1, gpio.OUT)
-        #self.servo = Servo(Pins.SERVO)
+        self.servo = Servo(Pins.SERVO)
     
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
         """
