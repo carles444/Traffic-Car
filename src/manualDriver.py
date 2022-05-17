@@ -41,7 +41,7 @@ class manualDriver:
         self.communication_socket = comunication_socket
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
         init_igpiod(self.logger)
-        #gpio.setmode(gpio.BOARD)
+        gpio.setmode(gpio.BCM)
         gpio.setup(Pins.DC_0, gpio.OUT)
         gpio.setup(Pins.DC_1, gpio.OUT)
         self.servo = Servo(Pins.SERVO)
