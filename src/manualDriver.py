@@ -6,7 +6,7 @@ from gpiozero import Servo
 class Pins(IntEnum):
     DC_0 = 16
     DC_1 = 18
-    SERVO = 22
+    SERVO = 25
 
 class Packet(IntEnum):
     SET_MODE = 1
