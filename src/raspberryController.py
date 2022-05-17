@@ -21,7 +21,7 @@ def remove_temp_files():
     if os.path.exists('temp'):
         shutil.rmtree('temp')
 
-
+# TODO: close GPIO pins
 
     
 class Controller:

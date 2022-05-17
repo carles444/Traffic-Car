@@ -34,6 +34,7 @@ class manualDriver:
         #self.servo = Servo(Pins.SERVO)
     
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
+        """
         if forward_bit >> MovementState.FORWARD:
             self.logger.debug('forward')
             gpio.output(Pins.DC_0, True)
@@ -46,8 +47,7 @@ class manualDriver:
             self.logger.debug('rest power')
             gpio.output(Pins.DC_0, False)
             gpio.output(Pins.DC_1, False)
-            
-        return
+            """
         if left_bit >> MovementState.LEFT:
             self.logger.debug('left')
             self.servo.min()
