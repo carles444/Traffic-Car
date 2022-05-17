@@ -41,11 +41,11 @@ class manualDriver:
         elif breaks_bit >> MovementState.BREAKS:
             self.logger.debug('breaks')
             gpio.output(Pins.DC_0, False)
-            gpio.output(Pins.DC_0, True)
+            gpio.output(Pins.DC_1, True)
         else:
             self.logger.debug('rest power')
             gpio.output(Pins.DC_0, False)
-            gpio.output(Pins.DC_0, False)
+            gpio.output(Pins.DC_1, False)
             
         return
         if left_bit >> MovementState.LEFT:
