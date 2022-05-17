@@ -37,7 +37,7 @@ class manualDriver:
         if forward_bit >> MovementState.FORWARD:
             self.logger.debug('forward')
             gpio.output(Pins.DC_0, True)
-            gpio.output(Pins.DC_0, True)
+            gpio.output(Pins.DC_1, True)
         elif breaks_bit >> MovementState.BREAKS:
             self.logger.debug('breaks')
             gpio.output(Pins.DC_0, False)
