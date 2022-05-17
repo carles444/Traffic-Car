@@ -23,7 +23,6 @@ def remove_temp_files():
 
 # TODO: close GPIO pins
 
-    
 class Controller:
     def __init__(self, uuid_service):
         self.modes = ['manual', 'autonomous', 'exit']
