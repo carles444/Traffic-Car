@@ -27,7 +27,7 @@ class MovementState(IntEnum):
 
 def init_igpiod(logger):
     try:
-        os.system('sudo killall pigpiod')
+        #os.system('sudo killall pigpiod')
         os.system('sudo pigpiod')
     except OSError:
         logger.error("Could not init igpiod")
