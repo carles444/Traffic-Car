@@ -1,7 +1,7 @@
 import RPi.GPIO as gpio
 from enum import IntEnum
 from logger import *
-from gpiozero.pins.native import NativeFactory
+from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import Servo, Device
 import os
 
@@ -32,7 +32,7 @@ def init_igpiod(logger):
     except OSError:
         logger.error("Could not init igpiod")
     finally:
-        Device.pin_factory = NativeFactory()
+        Device.pin_factory = PiGPIOFactory()
 
 class manualDriver:
     def __init__(self, comunication_socket):
