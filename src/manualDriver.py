@@ -53,17 +53,12 @@ class manualDriver:
         gpio.setup(Pins.DC_1, gpio.OUT)
         self.fw_pwm = gpio.PWM(Pins.DC_0, self.MAX_SPEED) # 100Hz
         self.fw_pwm.start(self.SPEED)
-        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.forward())
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
         self.servo = Servo(Pins.SERVO)
         self.last_action = None
     
-    def forward(self):
-        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.forward())
-        self.fw_timer.start()
-        self.SPEED += self.ACCELERATION
-        
-    def backward(self):
-        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.forward())
+    def accelerate(self):
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
         self.fw_timer.start()
         self.SPEED += self.ACCELERATION
         
@@ -74,14 +69,14 @@ class manualDriver:
             gpio.output(Pins.DC_1, True)
             if self.SPEED > 0:
                 self.SPEED = 0
-            self.forward()
+            self.accelerate()
             
         elif breaks_bit >> MovementState.BREAKS:
             self.logger.debug('breaks')
             gpio.output(Pins.DC_0, False)
             if self.SPEED > 0:
                 self.SPEED = -20
-            self.backward()
+            self.accelerate()
             #gpio.output(Pins.DC_1, True)
         else:
             self.fw_timer.cancel()
