@@ -27,14 +27,15 @@ class MovementState(IntEnum):
 
 def init_igpiod(logger):
     try:
-        pass
-        #os.system('sudo killall pigpiod')
-        #os.system('sudo pigpiod')
+        os.system('sudo killall pigpiod')
     except OSError:
-        logger.error("Could not init igpiod")
-    finally:
-        # avoiding jitter on servomotor
-        Device.pin_factory = PiGPIOFactory()
+        logger.warning('pigpiod not running')
+    try:
+        os.system('sudo pigpiod')
+    except OSError:
+        logger.error("pigpiod already running")
+    # avoiding jitter on servomotor
+    Device.pin_factory = PiGPIOFactory()
 
 class manualDriver:
     def __init__(self, comunication_socket):
