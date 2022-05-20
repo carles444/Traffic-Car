@@ -61,6 +61,7 @@ class manualDriver:
         self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
         self.fw_timer.start()
         if self.SPEED < self.MAX_SPEED:
+            print('accelerating')
             self.SPEED += self.ACCELERATION
         else:
             self.fw_timer.cancel()
