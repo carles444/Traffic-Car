@@ -60,8 +60,11 @@ class manualDriver:
     def accelerate(self):
         self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
         self.fw_timer.start()
-        self.SPEED += self.ACCELERATION
-        
+        if self.SPEED < self.MAX_SPEED:
+            self.SPEED += self.ACCELERATION
+        else:
+            self.fw_timer.cancel()
+            
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
         if forward_bit >> MovementState.FORWARD:
             self.logger.debug('forward')
