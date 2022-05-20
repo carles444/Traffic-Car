@@ -4,6 +4,7 @@ from logger import *
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import Servo, Device
 import os
+import threading
 
 class Pins(IntEnum):
     DC_0 = 23
@@ -26,6 +27,7 @@ class MovementState(IntEnum):
     LEFT = 2
 
 def init_igpiod(logger):
+    # TODO: fer que s'executi al iniciar la raspberry
     """try:
         os.system('sudo killall pigpiod')
     except OSError:
@@ -39,28 +41,56 @@ def init_igpiod(logger):
 
 class manualDriver:
     def __init__(self, comunication_socket):
+        self.ACCELERATION_RATE = 0.5
+        self.ACCELERATION = 20
+        self.SPEED = 0
+        self.MAX_SPEED = 100
         self.communication_socket = comunication_socket
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
         init_igpiod(self.logger)
         gpio.setmode(gpio.BCM)
         gpio.setup(Pins.DC_0, gpio.OUT)
         gpio.setup(Pins.DC_1, gpio.OUT)
+        self.fw_pwm = gpio.PWM(Pins.DC_0, self.MAX_SPEED) # 100Hz
+        self.fw_pwm.start(self.SPEED)
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.forward())
         self.servo = Servo(Pins.SERVO)
-        
+        self.last_action = None
     
+    def forward(self):
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.forward())
+        self.fw_timer.start()
+        self.SPEED += self.ACCELERATION
+        
+    def backward(self):
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.forward())
+        self.fw_timer.start()
+        self.SPEED += self.ACCELERATION
+        
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
         if forward_bit >> MovementState.FORWARD:
             self.logger.debug('forward')
-            gpio.output(Pins.DC_0, True)
+            #gpio.output(Pins.DC_0, True)
             gpio.output(Pins.DC_1, True)
+            if self.SPEED > 0:
+                self.SPEED = 0
+            self.forward()
+            
         elif breaks_bit >> MovementState.BREAKS:
             self.logger.debug('breaks')
             gpio.output(Pins.DC_0, False)
-            gpio.output(Pins.DC_1, True)
+            if self.SPEED > 0:
+                self.SPEED = -20
+            self.backward()
+            #gpio.output(Pins.DC_1, True)
         else:
+            self.fw_timer.cancel()
             self.logger.debug('rest power')
             gpio.output(Pins.DC_0, False)
-            gpio.output(Pins.DC_1, False)
+            #gpio.output(Pins.DC_1, False)
+            self.SPEED = 0
+            
+        self.fw_pwm.ChangeDutyCycle(self.SPEED)
             
         if left_bit >> MovementState.LEFT:
             self.logger.debug('left')
