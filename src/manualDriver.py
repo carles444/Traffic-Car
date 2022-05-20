@@ -63,6 +63,7 @@ class manualDriver:
         if self.SPEED < self.MAX_SPEED:
             print('accelerating')
             self.SPEED += self.ACCELERATION
+            self.fw_pwm.ChangeDutyCycle(self.SPEED)
         else:
             self.fw_timer.cancel()
             
@@ -88,8 +89,9 @@ class manualDriver:
             gpio.output(Pins.DC_0, False)
             #gpio.output(Pins.DC_1, False)
             self.SPEED = 0
+            self.fw_pwm.ChangeDutyCycle(self.SPEED)
             
-        self.fw_pwm.ChangeDutyCycle(self.SPEED)
+        
             
         if left_bit >> MovementState.LEFT:
             self.logger.debug('left')
