@@ -38,7 +38,7 @@ class RobotState(IntEnum):
 class Controller:
     def __init__(self, uuid_service):
         self.modes = ['manual', 'autonomous', 'exit']
-        self.manual_driver = None
+        self.driver = None
         self.autonomous_driver = None
         self.uuid_service = uuid_service
         self.connected = False
@@ -90,7 +90,6 @@ class Controller:
         if self.autonomous_driver is not None:
             self.autonomous_driver.stop_running()
             self.ad_thread.join()
-            self.ad_thread = None
         
     def __call__(self):
         self.connect()
