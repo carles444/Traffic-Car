@@ -73,15 +73,6 @@ class manualDriver:
             self.fw_pwm.ChangeDutyCycle(self.SPEED)
         else:
             self.fw_timer.cancel()
-    def decelerate(self):
-        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
-        self.fw_timer.start()
-        if self.SPEED > 0:
-            self.SPEED -= self.ACCELERATION
-            self.fw_pwm.ChangeDutyCycle(self.SPEED)
-        else:
-            self.fw_timer.cancel()
-            gpio.output(Pins.DC_0, False)
 
             
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
@@ -92,22 +83,18 @@ class manualDriver:
             if self.SPEED > 0:
                 self.SPEED = 0
             self.accelerate()
-            self.last_action = 'forward'
         elif breaks_bit >> MovementState.BREAKS:
             self.logger.debug('breaks')
-            gpio.output(Pins.DC_0, False)
             if self.SPEED > 0:
                 self.SPEED = -20
             self.accelerate()
+            gpio.output(Pins.DC_0, False)
             #gpio.output(Pins.DC_1, True)
-            self.last_action = 'breaks'
         else:
-            pin = True if self.last_action == 'forward_bit' else False
             self.fw_timer.cancel()
             self.logger.debug('rest power')
-            gpio.output(Pins.DC_0, pin)
+            gpio.output(Pins.DC_0, False)
             #gpio.output(Pins.DC_1, False)
-            self.decelerate()            
         
             
         if left_bit >> MovementState.LEFT:
