@@ -25,7 +25,7 @@ class MovementState(IntEnum):
     RIGHT = 3
     BREAKS = 1
     LEFT = 2
-
+ 
 def init_igpiod(logger):
     # TODO: fer que s'executi al iniciar la raspberry
     """try:
@@ -35,37 +35,54 @@ def init_igpiod(logger):
     try:
         os.system('sudo pigpiod')
     except OSError:
-        logger.error("pigpiod already running")
+        logger.warning("pigpiod already running")
     # avoiding jitter on servomotor
     Device.pin_factory = PiGPIOFactory()
 
 class manualDriver:
     def __init__(self, comunication_socket):
+        # globals
         self.ACCELERATION_RATE = 0.5
-        self.ACCELERATION = 20
+        self.ACCELERATION = 10
         self.SPEED = 0
         self.MAX_SPEED = 100
+        
+        # socket and logger
         self.communication_socket = comunication_socket
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
         init_igpiod(self.logger)
+        
+        # io management
         gpio.setmode(gpio.BCM)
         gpio.setup(Pins.DC_0, gpio.OUT)
         gpio.setup(Pins.DC_1, gpio.OUT)
         self.fw_pwm = gpio.PWM(Pins.DC_1, self.MAX_SPEED) # 100Hz
         self.fw_pwm.start(self.SPEED)
-        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
         self.servo = Servo(Pins.SERVO)
         self.last_action = None
+        
+        # accelerating timer
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
+
     
     def accelerate(self):
         self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
         self.fw_timer.start()
         if self.SPEED < self.MAX_SPEED:
-            print('accelerating')
             self.SPEED += self.ACCELERATION
             self.fw_pwm.ChangeDutyCycle(self.SPEED)
         else:
             self.fw_timer.cancel()
+    def decelerate(self):
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
+        self.fw_timer.start()
+        if self.SPEED > 0:
+            self.SPEED -= self.ACCELERATION
+            self.fw_pwm.ChangeDutyCycle(self.SPEED)
+        else:
+            self.fw_timer.cancel()
+            gpio.output(Pins.DC_0, False)
+
             
     def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
         if forward_bit >> MovementState.FORWARD:
@@ -75,7 +92,7 @@ class manualDriver:
             if self.SPEED > 0:
                 self.SPEED = 0
             self.accelerate()
-            
+            self.last_action = 'forward'
         elif breaks_bit >> MovementState.BREAKS:
             self.logger.debug('breaks')
             gpio.output(Pins.DC_0, False)
@@ -83,14 +100,14 @@ class manualDriver:
                 self.SPEED = -20
             self.accelerate()
             #gpio.output(Pins.DC_1, True)
+            self.last_action = 'breaks'
         else:
+            pin = True if self.last_action == 'forward_bit' else False
             self.fw_timer.cancel()
             self.logger.debug('rest power')
-            gpio.output(Pins.DC_0, False)
+            gpio.output(Pins.DC_0, pin)
             #gpio.output(Pins.DC_1, False)
-            self.SPEED = 0
-            self.fw_pwm.ChangeDutyCycle(self.SPEED)
-            
+            self.decelerate()            
         
             
         if left_bit >> MovementState.LEFT:
