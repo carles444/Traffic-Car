@@ -2,7 +2,8 @@ from enum import IntEnum
 import os
 import shutil
 import time
-from manualDriver import *
+from Driver import *
+from autonomousDriver import *
 from logger import *
 import bluetooth
 
@@ -20,6 +21,17 @@ def create_temp_files():
 def remove_temp_files():
     if os.path.exists('temp'):
         shutil.rmtree('temp')
+
+
+class Packet(IntEnum):
+    SET_MODE = 1
+    MOVE = 2
+
+
+class RobotState(IntEnum):
+    MANUAL = 1
+    AUTONOMOUS = 2
+    EXIT = 3
 
 # TODO: close GPIO pins
 
@@ -48,12 +60,37 @@ class Controller:
         
     def manual_mode(self):
         self.logger.info('Entering in manual mode')
-        if self.manual_driver is None:
-            self.manual_driver = manualDriver(self.sock)
-        return self.manual_driver()
-    
+        if self.driver is None:
+            self.driver = Driver()
+        while True:
+            data = int.from_bytes(self.communication_socket.recv(1), 'big')
+            packet_id = (data >> 4) & 0xf
+            if packet_id == Packet.SET_MODE:
+                self.logger.info("Changing mode... ")
+                return data
+            elif packet_id != Packet.MOVE:
+                continue
+            metadata = data & 0xf
+            forward_bit = metadata & 0x1
+            breaks_bit = metadata & 0x2
+            left_bit = metadata & 0x4
+            right_bit = metadata & 0x8
+            self.driver.apply_movement(forward_bit, breaks_bit, left_bit, right_bit)
+         
     def autonomous_mode(self):
         self.logger.info('Entering in autonomous mode')
+        if self.driver is None:
+            self.driver = Driver()
+        if self.autonomous_driver is None:
+            self.autonomous_driver = AutonomousDriver(self.driver)
+        self.ad_thread = threading.Thread(target=self.autonomous_driver)
+        self.ad_thread.start()
+            
+    def stop_autonomous_mode(self):
+        if self.autonomous_driver is not None:
+            self.autonomous_driver.stop_running()
+            self.ad_thread.join()
+            self.ad_thread = None
         
     def __call__(self):
         self.connect()
@@ -70,12 +107,14 @@ class Controller:
                 data = self.autonomous_mode()
             elif metadata == RobotState.MANUAL:
                 self.logger.info('Using manual mode')
+                self.stop_autonomous_mode()
                 data = self.manual_mode()
             elif metadata == RobotState.EXIT:
-                self.sock.close()
                 self.logger.info(f'Exited')
-                exit(0)
-                
+                self.stop_autonomous_mode()
+                self.sock.close()
+                break
+
 
 if __name__ == '__main__':
     controller = Controller(UUID)
