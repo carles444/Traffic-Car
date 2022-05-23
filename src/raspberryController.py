@@ -63,7 +63,7 @@ class Controller:
         if self.driver is None:
             self.driver = Driver()
         while True:
-            data = int.from_bytes(self.communication_socket.recv(1), 'big')
+            data = int.from_bytes(self.sock.recv(1), 'big')
             packet_id = (data >> 4) & 0xf
             if packet_id == Packet.SET_MODE:
                 self.logger.info("Changing mode... ")
