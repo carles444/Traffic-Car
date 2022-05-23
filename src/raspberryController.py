@@ -117,4 +117,6 @@ class Controller:
 
 if __name__ == '__main__':
     controller = Controller(UUID)
-    controller()
+    main_t = threading.Thread(target=controller)
+    main_t.start()
+    main_t.join()
