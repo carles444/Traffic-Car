@@ -94,6 +94,10 @@ class manualDriver:
             self.fw_timer.cancel()
             self.logger.debug('rest power')
             gpio.output(Pins.DC_0, False)
+            self.SPEED = 0
+            self.fw_pwm.ChangeDutyCycle(self.SPEED)
+
+            
             #gpio.output(Pins.DC_1, False)
         
             
