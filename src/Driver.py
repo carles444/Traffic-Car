@@ -57,46 +57,74 @@ class Driver:
         # accelerating timer
         self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
 
+    def check_bit(self, value, bit):
+        return (value & (1 << bit)) != 0
     
-    def accelerate(self):
+    def accelerate(self, acceleration_rate):
+        if self.fw_timer is not None:
+            self.fw_timer.cancel()
+            
         self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
         self.fw_timer.start()
-        if self.SPEED < self.MAX_SPEED:
-            self.SPEED += self.ACCELERATION
+        if acceleration_rate > 0:
+            self.SPEED = min(self.MAX_SPEED, self.SPEED + acceleration_rate)
             self.fw_pwm.ChangeDutyCycle(self.SPEED)
         else:
+            self.SPEED = max(-self.MAX_SPEED, self.SPEED + acceleration_rate)
+            self.fw_pwm.ChangeDutyCycle(self.SPEED)
+        
+        if abs(self.SPEED) >= self.MAX_SPEED:
             self.fw_timer.cancel()
+            self.fw_timer = None
+            
+    def breaks(self, acceleration_rate):
+        if self.fw_timer is not None:
+            self.fw_timer.cancel()
+        
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
+        self.fw_timer.start()
+        
+        acceleration_rate = abs(acceleration_rate)
+        if self.SPEED > 0:
+            self.SPEED = max(0, self.SPEED - acceleration_rate)
+            self.fw_pwm.ChangeDutyCycle(self.SPEED)
+        elif self.SPEED < 0:
+            self.SPEED = min(0, self.SPEED + acceleration_rate)
+            self.fw_pwm.ChangeDutyCycle(self.SPEED)
+        
+        if abs(self.SPEED) == 0:
+            self.fw_timer.cancel()
+            self.fw_timer = None
 
             
-    def apply_movement(self, forward_bit, breaks_bit, left_bit, right_bit):
-        if forward_bit >> MovementState.FORWARD:
+    def apply_movement(self, metadata):
+        if self.check_bit(metadata, MovementState.FORWARD):
             self.logger.debug('forward')
             gpio.output(Pins.DC_0, True)
             #gpio.output(Pins.DC_1, True)
-            if self.SPEED > 0:
-                self.SPEED = 0
-            self.accelerate()
-        elif breaks_bit >> MovementState.BREAKS:
+            self.accelerate(self.ACCELERATION_RATE)
+        elif self.check_bit(metadata, MovementState.BREAKS):
             self.logger.debug('breaks')
             if self.SPEED > 0:
                 self.SPEED = -20
-            self.accelerate()
+            self.accelerate(-(self.ACCELERATION_RATE))
             gpio.output(Pins.DC_0, False)
             #gpio.output(Pins.DC_1, True)
         else:
             self.fw_timer.cancel()
             self.logger.debug('rest power')
             gpio.output(Pins.DC_0, False)
-            self.SPEED = 0
-            self.fw_pwm.ChangeDutyCycle(self.SPEED)
-            
-        if left_bit >> MovementState.LEFT:
+            self.breaks(int(self.ACCELERATION_RATE/2))
+                 
+        if self.check_bit(metadata, MovementState.LEFT):
             self.logger.debug('left')
             self.servo.min()
-        elif right_bit >> MovementState.RIGHT:
+        elif self.check_bit(metadata, MovementState.RIGHT):
             self.logger.debug('right')
             self.servo.max()
         else:
             self.logger.debug('rest steering')
             self.servo.mid()
+            
+        self.last_action = metadata
             

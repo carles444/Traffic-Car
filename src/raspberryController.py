@@ -71,11 +71,7 @@ class Controller:
             elif packet_id != Packet.MOVE:
                 continue
             metadata = data & 0xf
-            forward_bit = metadata & 0x1
-            breaks_bit = metadata & 0x2
-            left_bit = metadata & 0x4
-            right_bit = metadata & 0x8
-            self.driver.apply_movement(forward_bit, breaks_bit, left_bit, right_bit)
+            self.driver.apply_movement(metadata)
          
     def autonomous_mode(self):
         self.logger.info('Entering in autonomous mode')
