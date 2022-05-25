@@ -104,19 +104,20 @@ class Driver:
     def apply_movement(self, metadata):
         if self.check_bit(metadata, MovementState.FORWARD):
             self.logger.debug('forward')
-            self.last_action = 'forward'
             # gpio.output(Pins.DC_1, True)
             self.accelerate(self.ACCELERATION)
+            self.last_action = 'forward'
+
         elif self.check_bit(metadata, MovementState.BREAKS):
             self.logger.debug('breaks')
-            self.last_action = 'forward'
             self.accelerate(-self.ACCELERATION)
+            self.last_action = 'breaks'
             # gpio.output(Pins.DC_1, True)
         else:
             self.logger.debug('rest power')
-            self.last_action = 'rest power'
             # gpio.output(Pins.DC_0, False)
             self.breaks(int(self.ACCELERATION/2))
+            self.last_action = 'rest power'
                  
         if self.check_bit(metadata, MovementState.LEFT):
             self.logger.debug('left')
