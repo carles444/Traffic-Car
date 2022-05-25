@@ -68,7 +68,7 @@ class Driver:
             self.bw_timer.cancel()
             self.rst_timer.cancel()
             self.speed = min(self.MAX_SPEED, self.speed + acceleration)
-            self.pwm.ChangeDutyCycle(self.speed)
+            self.pwm.ChangeDutyCycle(abs(self.speed))
             if self.speed < self.MAX_SPEED:
                 self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, [acceleration])
                 self.fw_timer.start()
