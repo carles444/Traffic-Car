@@ -82,7 +82,7 @@ class Driver:
                 self.bw_timer.start()
         gpio.output(Pins.DC_0, self.speed > 0)
 
-    def breaks(self, acceleration):
+    def rest(self, acceleration):
         self.logger.debug(self.speed)
         self.fw_timer.cancel()
         self.bw_timer.cancel()
@@ -93,7 +93,7 @@ class Driver:
         elif self.speed < 0:
             self.speed = min(0, self.speed + acceleration)
             self.pwm.ChangeDutyCycle(abs(self.speed))
-        self.rst_timer = threading.Timer(self.ACCELERATION_RATE, self.breaks, [acceleration])
+        self.rst_timer = threading.Timer(self.ACCELERATION_RATE, self.rest, [acceleration])
 
         self.rst_timer.start()
 
@@ -104,19 +104,21 @@ class Driver:
         if self.check_bit(metadata, MovementState.FORWARD):
             self.logger.debug('forward')
             # gpio.output(Pins.DC_1, True)
-            self.accelerate(self.ACCELERATION)
+            if self.last_action != 'forward':
+                self.accelerate(self.ACCELERATION)
             self.last_action = 'forward'
 
         elif self.check_bit(metadata, MovementState.BREAKS):
             self.logger.debug('breaks')
-            self.accelerate(-self.ACCELERATION)
+            if self.last_action != 'breaks':
+                self.accelerate(-self.ACCELERATION)
             self.last_action = 'breaks'
             # gpio.output(Pins.DC_1, True)
         else:
             self.logger.debug('rest power')
             # gpio.output(Pins.DC_0, False)
             if self.last_action != 'rest power':
-                self.breaks(int(self.ACCELERATION/2))
+                self.rest(int(self.ACCELERATION / 2))
             self.last_action = 'rest power'
                  
         if self.check_bit(metadata, MovementState.LEFT):
