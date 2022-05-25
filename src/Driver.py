@@ -95,8 +95,7 @@ class Driver:
             self.pwm.ChangeDutyCycle(abs(self.speed))
         self.rst_timer = threading.Timer(self.ACCELERATION_RATE, self.breaks, [acceleration])
 
-        if self.last_action != 'rest power':
-            self.rst_timer.start()
+        self.rst_timer.start()
 
         if self.speed == 0:
             self.rst_timer.cancel()
@@ -116,7 +115,8 @@ class Driver:
         else:
             self.logger.debug('rest power')
             # gpio.output(Pins.DC_0, False)
-            self.breaks(int(self.ACCELERATION/2))
+            if self.last_action != 'rest power':
+                self.breaks(int(self.ACCELERATION/2))
             self.last_action = 'rest power'
                  
         if self.check_bit(metadata, MovementState.LEFT):
@@ -128,4 +128,4 @@ class Driver:
         else:
             self.logger.debug('rest steering')
             self.servo.mid()
-                        
+
