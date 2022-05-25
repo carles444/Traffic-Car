@@ -111,7 +111,6 @@ class Driver:
             gpio.output(Pins.DC_0, False)
             #gpio.output(Pins.DC_1, True)
         else:
-            self.fw_timer.cancel()
             self.logger.debug('rest power')
             gpio.output(Pins.DC_0, False)
             self.breaks(int(self.ACCELERATION_RATE/2))
