@@ -64,7 +64,7 @@ class Driver:
         if self.fw_timer is not None:
             self.fw_timer.cancel()
             
-        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, acceleration_rate)
         self.fw_timer.start()
         if acceleration_rate > 0:
             self.SPEED = min(self.MAX_SPEED, self.SPEED + acceleration_rate)
@@ -81,7 +81,7 @@ class Driver:
         if self.fw_timer is not None:
             self.fw_timer.cancel()
         
-        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate)
+        self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, acceleration_rate)
         self.fw_timer.start()
         
         acceleration_rate = abs(acceleration_rate)
