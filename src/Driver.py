@@ -61,6 +61,7 @@ class Driver:
         return (value & (1 << bit)) != 0
     
     def accelerate(self, acceleration_rate):
+        self.logger.debug(self.SPEED)
         if self.fw_timer is not None:
             self.fw_timer.cancel()
             
@@ -78,6 +79,7 @@ class Driver:
             self.fw_timer = None
             
     def breaks(self, acceleration_rate):
+        self.logger.debug(self.SPEED)
         if self.fw_timer is not None:
             self.fw_timer.cancel()
         
