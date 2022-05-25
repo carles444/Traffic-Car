@@ -98,6 +98,7 @@ class Driver:
 
         if self.speed == 0:
             self.rst_timer.cancel()
+
             
     def apply_movement(self, metadata):
         if self.check_bit(metadata, MovementState.FORWARD):
@@ -110,7 +111,7 @@ class Driver:
             # gpio.output(Pins.DC_1, True)
         else:
             self.logger.debug('rest power')
-            gpio.output(Pins.DC_0, False)
+            # gpio.output(Pins.DC_0, False)
             self.breaks(int(self.ACCELERATION/2))
                  
         if self.check_bit(metadata, MovementState.LEFT):
