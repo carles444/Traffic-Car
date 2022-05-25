@@ -128,6 +128,4 @@ class Driver:
         else:
             self.logger.debug('rest steering')
             self.servo.mid()
-            
-        self.last_action = metadata
-            
+                        
