@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # gray_img = cv.GaussianBlur(gray_img, (5, 5), 0)
     
     # canny edge detection
-    canny_img = cv.Canny(contrast_img, 100 ,200, None, 3)
+    canny_img = cv.Canny(contrast_img, 100, 200, None, 3)
     cv.imshow('road', canny_img)
     cv.waitKey()
     

@@ -12,6 +12,7 @@ SERVER_ADDRESS = '04:6C:59:F1:F3:E1'
 SERVER_PORT = 5
 UUID = '00000000-0000-0000-0000-000000000005'
 
+
 def create_temp_files():
     if os.path.exists('temp'):
         shutil.rmtree('temp')
@@ -32,11 +33,15 @@ class RobotState(IntEnum):
     MANUAL = 1
     AUTONOMOUS = 2
     EXIT = 3
+    SEND_VIDEO = 4
 
-# TODO: close GPIO pins
 
 class Controller:
     def __init__(self, uuid_service):
+        self.sock = None
+        self.address = None
+        self.name = None
+        self.port = None
         self.modes = ['manual', 'autonomous', 'exit']
         self.driver = None
         self.autonomous_driver = None
@@ -45,6 +50,7 @@ class Controller:
         self.DEFAULT_TIMEOUT = 5
         self.logger = Logger().getLogger('Raspberry Controller', logging.DEBUG)
         self.logger.debug(f'Controller initializated with uuid: {self.uuid_service}')
+        self.ad_thread = None
 
     def connect(self):
         services = []
@@ -99,7 +105,7 @@ class Controller:
             metadata = data & 0xf
             if metadata == RobotState.AUTONOMOUS:
                 self.logger.info('Using autonomous mode')
-                data = self.autonomous_mode()
+                self.autonomous_mode()
             elif metadata == RobotState.MANUAL:
                 self.logger.info('Using manual mode')
                 self.stop_autonomous_mode()
@@ -109,6 +115,8 @@ class Controller:
                 self.stop_autonomous_mode()
                 self.sock.close()
                 break
+                
+        del self.driver
 
 
 if __name__ == '__main__':

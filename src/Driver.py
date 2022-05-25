@@ -19,16 +19,9 @@ class MovementState(IntEnum):
     LEFT = 2
 
 
-def init_igpiod(logger):
-    # TODO: fer que s'executi al iniciar la raspberry
-    """try:
-        os.system('sudo killall pigpiod')
-    except OSError:
-        logger.warning('pigpiod not running')"""
-    try:
-        os.system('sudo pigpiod')
-    except OSError:
-        logger.warning("pigpiod already running")
+def init_pigpiod(logger):
+    logger.debug('pigpio mode')
+    os.system('sudo pigpiod')
     # avoiding jitter on servomotor
     Device.pin_factory = PiGPIOFactory()
 
@@ -43,13 +36,13 @@ class Driver:
         
         # logger
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
-        init_igpiod(self.logger)
+        init_pigpiod(self.logger)
         
         # io management
         gpio.setmode(gpio.BCM)
         gpio.setup(Pins.DC_0, gpio.OUT)
         gpio.setup(Pins.DC_1, gpio.OUT)
-        self.pwm = gpio.PWM(Pins.DC_1, self.MAX_SPEED) # 100Hz
+        self.pwm = gpio.PWM(Pins.DC_1, self.MAX_SPEED)  # 100Hz
         self.pwm.start(self.speed)
         self.servo = Servo(Pins.SERVO)
         self.last_action = None
@@ -58,6 +51,12 @@ class Driver:
         self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, [0])
         self.bw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, [0])
         self.rst_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, [0])
+
+    def __del__(self):
+        self.fw_timer.cancel()
+        self.bw_timer.cancel()
+        self.rst_timer.cancel()
+        gpio.cleanup()
 
     def check_bit(self, value, bit):
         return (value & (1 << bit)) != 0
@@ -103,7 +102,6 @@ class Driver:
     def apply_movement(self, metadata):
         if self.check_bit(metadata, MovementState.FORWARD):
             self.logger.debug('forward')
-            # gpio.output(Pins.DC_1, True)
             if self.last_action != 'forward':
                 self.accelerate(self.ACCELERATION)
             self.last_action = 'forward'
@@ -113,10 +111,8 @@ class Driver:
             if self.last_action != 'breaks':
                 self.accelerate(-self.ACCELERATION)
             self.last_action = 'breaks'
-            # gpio.output(Pins.DC_1, True)
         else:
             self.logger.debug('rest power')
-            # gpio.output(Pins.DC_0, False)
             if self.last_action != 'rest power':
                 self.rest(int(self.ACCELERATION / 2))
             self.last_action = 'rest power'
