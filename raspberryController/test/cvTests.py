@@ -17,7 +17,7 @@ def max_contrast(img):
 
 if __name__ == '__main__':
     # load image
-    img = cv.imread('data/road2.jpg')
+    img = cv.imread('../data/road2.jpg')
     
     # resize image
     img = cv.resize(img, (img.shape[1]*2, img.shape[0]*2))

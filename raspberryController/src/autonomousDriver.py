@@ -9,6 +9,10 @@ class AutonomousDriver:
         self.logger = Logger().getLogger('AutonomousDriver')
         self.running = False
         self.camera = None
+        
+    def __del__(self):
+        if self.camera is not None:
+            self.camera.release()
 
     def setup(self):
         self.camera = cv.VideoCapture(0)

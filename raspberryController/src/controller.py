@@ -115,8 +115,11 @@ class Controller:
                 self.stop_autonomous_mode()
                 self.sock.close()
                 break
-                
-        del self.driver
+        
+        if self.driver is not None:
+            del self.driver
+        if self.autonomous_driver is not None:
+            del self.autonomous_driver
 
 
 if __name__ == '__main__':
