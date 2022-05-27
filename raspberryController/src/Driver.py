@@ -17,6 +17,8 @@ class MovementState(IntEnum):
     RIGHT = 3
     BREAKS = 1
     LEFT = 2
+    POWER_REST = 5
+    STEER_REST = 6
 
 
 def init_pigpiod(logger):
@@ -102,20 +104,20 @@ class Driver:
     def apply_movement(self, metadata):
         if self.check_bit(metadata, MovementState.FORWARD):
             self.logger.debug('forward')
-            if self.last_action != 'forward':
+            if self.last_action != MovementState.FORWARD:
                 self.accelerate(self.ACCELERATION)
-            self.last_action = 'forward'
+            self.last_action = MovementState.FORWARD
 
         elif self.check_bit(metadata, MovementState.BREAKS):
             self.logger.debug('breaks')
-            if self.last_action != 'breaks':
+            if self.last_action != MovementState.BREAKS:
                 self.accelerate(-self.ACCELERATION)
-            self.last_action = 'breaks'
+            self.last_action = MovementState.BREAKS
         else:
             self.logger.debug('rest power')
-            if self.last_action != 'rest power':
+            if self.last_action != MovementState.POWER_REST:
                 self.rest(int(self.ACCELERATION / 2))
-            self.last_action = 'rest power'
+            self.last_action = MovementState.POWER_REST
                  
         if self.check_bit(metadata, MovementState.LEFT):
             self.logger.debug('left')
