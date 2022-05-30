@@ -100,7 +100,7 @@ class Driver:
         elif self.speed < 0:
             self.speed = min(0, self.speed + acceleration)
             self.pwm.ChangeDutyCycle(abs(self.speed))
-        self.rst_timer = threading.Timer(self.ACCELERATION_RATE, self.rest, [acceleration])
+        self.rst_timer = threading.Timer(self.ACCELERATION_RATE, self.breaks, [acceleration])
 
         self.rst_timer.start()
 
