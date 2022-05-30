@@ -37,7 +37,7 @@ class Driver:
         self.speed = 0
         self.MAX_SPEED = 100
         self.STEER_REST = 0
-        self.MAX_STEER = 0.3
+        self.MAX_STEER = 0.5
         
         # logger
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
@@ -132,10 +132,10 @@ class Driver:
             
         if self.check_bit(metadata, MovementState.LEFT):
             self.logger.debug('left')
-            self.servo.value = -self.MAX_STEER
+            self.servo.value = self.MAX_STEER
         elif self.check_bit(metadata, MovementState.RIGHT):
             self.logger.debug('right')
-            self.servo.value = self.MAX_STEER
+            self.servo.value = -self.MAX_STEER
         else:
             self.logger.debug('rest steering')
             self.servo.value = self.STEER_REST
