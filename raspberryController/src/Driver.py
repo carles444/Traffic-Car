@@ -37,7 +37,7 @@ class Driver:
         self.speed = 0
         self.MAX_SPEED = 100
         self.STEER_REST = 0
-        self.MAX_STEER = 0.7
+        self.MAX_STEER = 0.65
         
         # logger
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
