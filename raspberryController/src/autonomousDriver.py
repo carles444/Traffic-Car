@@ -29,7 +29,6 @@ class AutonomousDriver:
     def __call__(self):
         self.running = True
         self.setup()
-        print('running')
         while self.running:
             ret, frame = self.camera.read()
             if not ret:
