@@ -6,7 +6,7 @@ import cv2 as cv
 class AutonomousDriver:
     def __init__(self, driver):
         self.driver = driver
-        self.logger = Logger().getLogger('AutonomousDriver')
+        self.logger = Logger().getLogger('AutonomousDriver', logging.DEBUG)
         self.running = False
         self.camera = None
         

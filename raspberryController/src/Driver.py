@@ -15,10 +15,11 @@ class Pins(IntEnum):
 class MovementState(IntEnum):
     FORWARD = 0
     RIGHT = 3
-    BREAKS = 1
+    BACKWARD = 1
     LEFT = 2
     POWER_REST = 5
     STEER_REST = 6
+    BREAKS = 7
 
 
 def init_pigpiod(logger):
@@ -35,6 +36,8 @@ class Driver:
         self.ACCELERATION = 10
         self.speed = 0
         self.MAX_SPEED = 100
+        self.STEER_REST = 0
+        self.MAX_STEER = 0.5
         
         # logger
         self.logger = Logger().getLogger('Manual Driver', logging.DEBUG)
@@ -47,7 +50,7 @@ class Driver:
         self.pwm = gpio.PWM(Pins.DC_1, self.MAX_SPEED)  # 100Hz
         self.pwm.start(self.speed)
         self.servo = Servo(Pins.SERVO)
-        self.last_action = None
+        self.last_action = MovementState.POWER_REST
         
         # accelerating timer
         self.fw_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, [0])
@@ -55,9 +58,12 @@ class Driver:
         self.rst_timer = threading.Timer(self.ACCELERATION_RATE, self.accelerate, [0])
 
     def __del__(self):
-        self.fw_timer.cancel()
-        self.bw_timer.cancel()
-        self.rst_timer.cancel()
+        if self.fw_timer is not None:
+            self.fw_timer.cancel()
+        if self.bw_timer is not None:
+            self.bw_timer.cancel()
+        if self.rst_timer is not None:
+            self.rst_timer.cancel()
         gpio.cleanup()
 
     def check_bit(self, value, bit):
@@ -83,7 +89,7 @@ class Driver:
                 self.bw_timer.start()
         gpio.output(Pins.DC_0, self.speed > 0)
 
-    def rest(self, acceleration):
+    def breaks(self, acceleration):
         self.logger.debug(self.speed)
         self.fw_timer.cancel()
         self.bw_timer.cancel()
@@ -104,28 +110,33 @@ class Driver:
     def apply_movement(self, metadata):
         if self.check_bit(metadata, MovementState.FORWARD):
             self.logger.debug('forward')
-            if self.last_action != MovementState.FORWARD:
+            if self.last_action != MovementState.BREAKS and self.speed < 0:
+                self.breaks(self.acceleration)
+                self.last_action = MovementState.BREAKS
+            elif self.last_action != MovementState.FORWARD:
                 self.accelerate(self.ACCELERATION)
-            self.last_action = MovementState.FORWARD
-
-        elif self.check_bit(metadata, MovementState.BREAKS):
+                self.last_action = MovementState.FORWARD
+        elif self.check_bit(metadata, MovementState.BACKWARD):
             self.logger.debug('breaks')
-            if self.last_action != MovementState.BREAKS:
+            if self.last_action != MovementState.BREAKS and self.speed > 0:
+                self.breaks(-self.ACCELERATION)
+                self.last_action = MovementState.BREAKS
+            elif self.last_action != MovementState.BACKWARD:
                 self.accelerate(-self.ACCELERATION)
-            self.last_action = MovementState.BREAKS
+                self.last_action = MovementState.BACKWARD
         else:
             self.logger.debug('rest power')
             if self.last_action != MovementState.POWER_REST:
-                self.rest(int(self.ACCELERATION / 2))
+                self.breaks(int(self.ACCELERATION / 2))
             self.last_action = MovementState.POWER_REST
-                 
+            
         if self.check_bit(metadata, MovementState.LEFT):
             self.logger.debug('left')
-            self.servo.min()
+            self.servo.value = -self.MAX_STEER
         elif self.check_bit(metadata, MovementState.RIGHT):
             self.logger.debug('right')
-            self.servo.max()
+            self.servo.value = self.MAX_STEER
         else:
             self.logger.debug('rest steering')
-            self.servo.mid()
+            self.servo.value = self.STEER_REST
 
