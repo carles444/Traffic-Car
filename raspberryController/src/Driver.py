@@ -9,7 +9,7 @@ import threading
 class Pins(IntEnum):
     DC_0 = 23
     DC_1 = 24
-    SERVO = 25
+    SERVO = 18
 
 
 class MovementState(IntEnum):
