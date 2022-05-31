@@ -111,7 +111,7 @@ class Driver:
         if self.check_bit(metadata, MovementState.FORWARD):
             self.logger.debug('forward')
             if self.last_action != MovementState.BREAKS and self.speed < 0:
-                self.breaks(self.acceleration)
+                self.breaks(self.ACCELERATION)
                 self.last_action = MovementState.BREAKS
             elif self.last_action != MovementState.FORWARD:
                 self.accelerate(self.ACCELERATION)
